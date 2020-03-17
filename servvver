@@ -1,0 +1,27 @@
+import socket
+
+sock = socket.socket()
+sock.bind(('', 8014))
+sock.listen(1)
+conn, addr = sock.accept()
+
+print ('connected:', addr)
+
+while True:
+    data_type = conn.recv(100000)
+    if (str(data_type.decode('utf-8')) == 'message' ):
+        data = conn.recv(100000)
+        conn.send(data)
+    elif (str(data_type.decode('utf-8')) == 'file'):
+        name = conn.recv(100000)
+        conn.send(name)
+        file = open(name.decode('utf-8'), "wb")
+        buffer = conn.recv(100000)
+        file.write(buffer)
+        file.close()
+        conn.send(buffer)
+    if not data_type:
+        break
+
+
+conn.close()
